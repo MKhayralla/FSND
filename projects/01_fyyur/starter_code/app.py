@@ -3,8 +3,6 @@
 #----------------------------------------------------------------------------#
 
 import json
-import dateutil.parser
-import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 import logging
@@ -27,13 +25,7 @@ migrate = Migrate(app, db)
 # Filters.
 #----------------------------------------------------------------------------#
 
-def format_datetime(value, format='medium'):
-  date = dateutil.parser.parse(value)
-  if format == 'full':
-      format="EEEE MMMM, d, y 'at' h:mma"
-  elif format == 'medium':
-      format="EE MM, dd, y h:mma"
-  return babel.dates.format_datetime(date, format, locale='en')
+
 
 app.jinja_env.filters['datetime'] = format_datetime
 
@@ -187,11 +179,18 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-
+  obj = request.form
+  seeking_talent = get_boolean(obj.get('seeking_talent'))
+  genres = obj.getlist('genres')
+  venue = add_venue(obj.get('name'), genres, obj.get('address'),
+  obj.get('city'), obj.get('state'), obj.get('phone'),
+  obj.get('website_link'), obj.get('facebook_link'),
+  seeking_talent, obj.get('seeking_description'), obj.get('image_link')) 
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+  if venue is not None:
+    flash('Venue ' + venue.name + ' was successfully listed!')
+  else:
+    flash('An error occurred. Venue ' + obj.get('name') + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
@@ -378,14 +377,18 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-
+  obj = request.form
+  seeking_venue = get_boolean(obj.get('seeking_venue'))
+  genres = obj.getlist('genres')
+  artist = add_artist(obj.get('name'), genres,
+  obj.get('city'), obj.get('state'), obj.get('phone'),
+  obj.get('website_link'), obj.get('facebook_link'),
+  seeking_venue, obj.get('seeking_description'), obj.get('image_link')) 
   # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  if artist is not None:
+    flash('Artist ' + artist.name + ' was successfully listed!')
+  else:
+    flash('An error occurred. Artist ' + obj.get('name') + ' could not be listed.')
   return render_template('pages/home.html')
 
 
@@ -445,11 +448,13 @@ def create_shows():
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
-
+  obj = request.form
+  show = add_show(obj.get('artist_id'), obj.get('venue_id'), obj.get('start_time'))
   # on successful db insert, flash success
-  flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
+  if show is not None:
+        flash('Show was successfully listed!')
+  else:
+        flash('An error occurred. Show could not be listed.') 
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 

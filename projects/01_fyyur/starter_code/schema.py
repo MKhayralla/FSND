@@ -43,7 +43,7 @@ class Show(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable = False)
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable = False)
-    starts_at = db.Column(db.Date, nullable = False)    
+    starts_at = db.Column(db.DateTime, nullable = False)    
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
