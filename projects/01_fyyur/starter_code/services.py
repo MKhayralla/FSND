@@ -75,3 +75,21 @@ def add_show(artist_id, venue_id, start_date):
         print(e)
         return db.session.rollback()
     return show
+
+#artists
+#venues
+#shows
+def list_shows():
+    res = Show.query.join(Artist, Venue).all()
+    output = []
+    for show in res:
+        item = {}
+        item['venue_id'] = show.venue.id
+        item['venue_name'] = show.venue.name
+        item['artist_id'] = show.artist.id
+        item['artist_name'] = show.artist.name
+        item['artist_image_link'] = show.artist.image_link
+        item['start_time'] = str(show.starts_at)
+        item['start_time'] = format_datetime(item['start_time'])
+        output.append(item)
+    return output
