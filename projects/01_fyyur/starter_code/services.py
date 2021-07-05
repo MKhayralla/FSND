@@ -11,6 +11,7 @@ from schema import *
 
 #Functions
 def format_datetime(value, format='medium'):
+    '''filter for date show'''
     date = dateutil.parser.parse(value)
     if format == 'full':
       format="EEEE MMMM, d, y 'at' h:mma"
@@ -69,6 +70,7 @@ def add_artist(form_obj):
     return artist
 
 def add_show(artist_id, venue_id, start_date):
+    '''creates new show and insert it to the database'''
     show = Show(artist_id = artist_id, venue_id = venue_id, starts_at = start_date)
     try:
         db.session.add(show)
@@ -80,9 +82,11 @@ def add_show(artist_id, venue_id, start_date):
 
 #artists
 def get_artist(id):
+    '''get the artist of the required id'''
     res = Artist.query.get(id)
     return res
 def get_artists():
+    '''get all artists'''
     res = Artist.query.all()
     return res
 def edit_artist_data(artist_id, new_data):
@@ -108,6 +112,7 @@ def edit_artist_data(artist_id, new_data):
     return artist
 
 def get_artist_data(id):
+    '''get details of an artist'''
     artist = get_artist(id)
     res = {}
     res['id'] = artist.id
@@ -127,6 +132,7 @@ def get_artist_data(id):
     res['upcoming_shows_count'] = len(res['upcoming_shows'])
     return res
 def search_artists_query(q):
+    '''search artists'''
     artists = Artist.query.filter(Artist.name.ilike('%'+q+'%')).all()
     res = {}
     res['count'] = len(artists)
@@ -141,6 +147,7 @@ def search_artists_query(q):
     return res
 #venues
 def get_venue(id):
+    '''get venue of the required id'''
     res = Venue.query.get(id)
     return res
 def edit_venue_data(venue_id, new_data):
@@ -167,6 +174,7 @@ def edit_venue_data(venue_id, new_data):
     return venue
 
 def get_venue_data(id):
+    '''get details of a required venue'''
     venue = get_venue(id)
     res = {}
     res['id'] = venue.id
@@ -188,6 +196,7 @@ def get_venue_data(id):
     return res
 
 def get_venues():
+    '''get all venues grouped by city and state'''
     data = []
     venues = Venue.query.all()
     places = Venue.query.distinct(Venue.city, Venue.state).all()
@@ -205,6 +214,7 @@ def get_venues():
         )
     return data
 def search_venues_query(q):
+    '''search venues'''
     venues = Venue.query.filter(Venue.name.ilike('%'+q+'%')).all()
     res = {}
     res['count'] = len(venues)
@@ -218,8 +228,10 @@ def search_venues_query(q):
     res['data'] = data
     return res
 def delete_venue_row(id):
+    '''delete the required venue'''
     venue = get_venue(id)
     try:
+        #delete the associated shows first
         Show.query.filter(Show.venue_id == venue.id).delete()
         db.session.delete(venue)
         db.session.commit()
@@ -230,6 +242,7 @@ def delete_venue_row(id):
 
 #shows
 def list_shows():
+    '''get all shows'''
     res = Show.query.all()
     return res
 
